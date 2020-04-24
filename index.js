@@ -34,10 +34,10 @@ function options() {
         .then(function (data) {
             switch (data.choices) {
                 case "View All Employees":
-                    options();
+                    viewAll();
                     break;
                 case "View All Employees By Department":
-                    options();
+                    viewAllByManager();
                     break;
                 case "View All Employees By Manager":
                     options();
@@ -56,4 +56,24 @@ function options() {
                     break;
             }
         });
+}
+
+function viewAll() {
+    connection.query(`
+    SELECT employees.id as id, employees.first_name, employees.last_name,title, name as department, salary, CONCAT(manager.first_name, " ",manager.last_name) as manager 
+    FROM employees
+    LEFT JOIN roles
+    ON employees.role_id = roles.id
+    LEFT JOIN departments
+    ON roles.department_id = departments.id
+    LEFT JOIN employees as manager
+    ON employees.manager_id = manager.id`, function (err, results) {
+        if (err) throw err;
+        console.table(results);
+        options();
+    })
+}
+
+function viewAllByManager() {
+
 }
