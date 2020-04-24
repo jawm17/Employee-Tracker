@@ -1,4 +1,18 @@
+const mysql = require("mysql");
 const inquirer = require("inquirer");
+
+const connection = mysql.createConnection({
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "koikoi42",
+    database: "employees_db"
+});
+
+connection.connect(function (err) {
+    if (err) throw err;
+    options();
+});
 
 function options() {
     inquirer
@@ -18,8 +32,28 @@ function options() {
             }
         ])
         .then(function (data) {
-            console.log(data);
+            switch (data.choices) {
+                case "View All Employees":
+                    options();
+                    break;
+                case "View All Employees By Department":
+                    options();
+                    break;
+                case "View All Employees By Manager":
+                    options();
+                    break;
+                case "Add Employee":
+                    options();
+                    break;
+                case "Remove Employee":
+                    options();
+                    break;
+                case "Update Employee Role":
+                    options();
+                    break;
+                case "Update Employee Manager":
+                    options();
+                    break;
+            }
         });
 }
-
-options();
