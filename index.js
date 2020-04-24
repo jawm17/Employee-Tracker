@@ -16,7 +16,7 @@ connection.connect(function (err) {
 
 function options() {
     inquirer
-        .prompt([
+        .prompt(
             {
                 type: "list",
                 message: "What would you like to do?",
@@ -29,33 +29,31 @@ function options() {
                     "Remove Employee",
                     "Update Employee Role",
                     "Update Employee Manager"]
-            }
-        ])
-        .then(function (data) {
-            switch (data.choices) {
-                case "View All Employees":
-                    viewAll();
-                    break;
-                case "View All Employees By Department":
-                    viewAllByManager();
-                    break;
-                case "View All Employees By Manager":
-                    options();
-                    break;
-                case "Add Employee":
-                    options();
-                    break;
-                case "Remove Employee":
-                    options();
-                    break;
-                case "Update Employee Role":
-                    options();
-                    break;
-                case "Update Employee Manager":
-                    options();
-                    break;
-            }
-        });
+            }).then(function (data) {
+                switch (data.choices) {
+                    case "View All Employees":
+                        viewAll();
+                        break;
+                    case "View All Employees By Department":
+                        viewAllByManager();
+                        break;
+                    case "View All Employees By Manager":
+                        options();
+                        break;
+                    case "Add Employee":
+                        options();
+                        break;
+                    case "Remove Employee":
+                        options();
+                        break;
+                    case "Update Employee Role":
+                        options();
+                        break;
+                    case "Update Employee Manager":
+                        options();
+                        break;
+                }
+            });
 }
 
 function viewAll() {
@@ -67,13 +65,35 @@ function viewAll() {
     LEFT JOIN departments
     ON roles.department_id = departments.id
     LEFT JOIN employees as manager
-    ON employees.manager_id = manager.id`, function (err, results) {
-        if (err) throw err;
-        console.table(results);
-        options();
-    })
+    ON employees.manager_id = manager.id`,
+        function (err, results) {
+            if (err) throw err;
+            console.table(results);
+            options();
+        });
 }
 
 function viewAllByManager() {
-
+    inquirer.prompt({
+        type: "list",
+        message: "Which department would you like to see employees for?",
+        name: "department",
+        choices: ["Sales", "Engineering", "Finance", "Legal"]
+    }).then(function (data) {
+        connection.query(`
+        SELECT employees.id as id, employees.first_name, employees.last_name, title
+        FROM employees
+        LEFT JOIN roles
+        ON employees.role_id = roles.id
+        LEFT JOIN departments
+        ON roles.department_id = departments.id
+        LEFT JOIN employees as manager
+        ON employees.manager_id = manager.id
+        WHERE departments.name = "${data.department}"`,
+            function (err, results) {
+                if (err) throw err;
+                console.table(results);
+                options();
+            });
+    });
 }
