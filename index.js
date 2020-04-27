@@ -1,7 +1,9 @@
+// Requirements
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const process = require("process");
 
+// Create DB connection
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -10,11 +12,13 @@ const connection = mysql.createConnection({
     database: "employees_db"
 });
 
+// Connect to DB
 connection.connect(function (err) {
     if (err) throw err;
     options();
 });
 
+// Default options
 function options() {
     inquirer
         .prompt(
@@ -57,6 +61,7 @@ function options() {
             });
 }
 
+// Logs a table of all employee, department, role data
 function viewAll() {
     connection.query(`
     SELECT employees.id as id, employees.first_name, employees.last_name,title, name as department, salary, CONCAT(manager.first_name, " ",manager.last_name) as manager 
@@ -74,6 +79,7 @@ function viewAll() {
         });
 }
 
+// Logs a table of all employees in a certain department
 function viewAllByDepartment() {
     inquirer.prompt({
         type: "list",
@@ -99,6 +105,7 @@ function viewAllByDepartment() {
     });
 }
 
+// Adds edmployee to DB
 function addEmployee() {
     inquirer.prompt([
         {
@@ -149,7 +156,7 @@ function addEmployee() {
     });
 }
 
-
+// Adds role to DB
 function addRole() {
     inquirer.prompt([
         {
@@ -196,6 +203,7 @@ function addRole() {
     });
 }
 
+// Adds department to DB
 function addDepartment() {
     inquirer.prompt([
         {
@@ -217,6 +225,7 @@ function addDepartment() {
     });
 }
 
+// Updates existing role based on inputs
 function updateRole() {
     inquirer.prompt([
         {
