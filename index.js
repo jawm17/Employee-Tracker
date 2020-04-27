@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const process = require("process");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -24,34 +25,34 @@ function options() {
                 choices: [
                     "View All Employees",
                     "View All Employees By Department",
-                    "View All Employees By Manager",
                     "Add Employee",
-                    "Remove Employee",
+                    "Add Role",
+                    "Add Department",
                     "Update Employee Role",
-                    "Update Employee Manager"]
+                    "Exit"]
             }).then(function (data) {
                 switch (data.choices) {
                     case "View All Employees":
                         viewAll();
                         break;
                     case "View All Employees By Department":
-                        viewAllByManager();
-                        break;
-                    case "View All Employees By Manager":
-                        options();
+                        viewAllByDepartment();
                         break;
                     case "Add Employee":
-                        options();
+                        addEmployee();
                         break;
-                    case "Remove Employee":
-                        options();
+                    case "Add Role":
+                        addRole();
+                        break;
+                    case "Add Department":
+                        addDepartment();
                         break;
                     case "Update Employee Role":
-                        options();
+                        updateRole();
                         break;
-                    case "Update Employee Manager":
-                        options();
-                        break;
+                    default:
+                        process.exit();
+
                 }
             });
 }
@@ -73,7 +74,7 @@ function viewAll() {
         });
 }
 
-function viewAllByManager() {
+function viewAllByDepartment() {
     inquirer.prompt({
         type: "list",
         message: "Which department would you like to see employees for?",
@@ -96,4 +97,109 @@ function viewAllByManager() {
                 options();
             });
     });
+}
+
+function addEmployee() {
+    inquirer.prompt([
+        {
+            name: "firstName",
+            message: "What is the employee's first name?"
+        },
+        {
+            name: "lastName",
+            message: "What is the employee's last name?"
+        },
+        {
+            name: "role",
+            type: "list",
+            message: "What is the employee's role?",
+            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer"]
+        },
+        {
+            name: "manager",
+            type: "list",
+            message: "Who is the employee's manager?",
+            choices: ["John", "Mike", "Ashley", "Kevin", "Kunal", "Malia", "Sarah", "Tom", "None"]
+        }
+    ]).then(function (data) {
+        connection.query(`SELECT id FROM employees WHERE first_name = "${data.manager}"`,
+            function (err, results) {
+                if (err) throw err;
+                let manager = results[0].id;
+                connection.query(`SELECT id FROM roles WHERE title = "${data.role}"`,
+                    function (err, results) {
+                        if (err) throw err;
+                        let role = results[0].id;
+
+                        connection.query("INSERT INTO employees SET ?",
+                            {
+                                first_name: data.firstName,
+                                last_name: data.lastName,
+                                role_id: role,
+                                manager_id: manager
+                            },
+                            function (err) {
+                                if (err) throw err;
+                                console.log("Your employee was created successfully!");
+                                options();
+                            }
+                        );
+                    });
+            });
+    });
+}
+
+
+function addRole() {
+    inquirer.prompt([
+        {
+            name: "title",
+            type: "input",
+            message: "What is the name of the role?"
+        },
+        {
+            name: "salary",
+            type: "input",
+            message: "What is the salary for this role?"
+        },
+        {
+            name: "department",
+            type: "list",
+            message: "Which department will this role be in?",
+            choices: [
+                "Engineering",
+                "Sales",
+                "Finance",
+                "Legal"
+            ]
+        }
+    ]).then(function (data) {
+        connection.query(`SELECT id FROM departments WHERE name = "${data.department}"`,
+            function (err, results) {
+                if (err) throw err;
+                let department = results[0].id;
+
+                connection.query("INSERT INTO roles SET ?",
+                    {
+                        title: data.title,
+                        salary: data.salary,
+                        department_id: department
+                    },
+                    function (err) {
+                        if (err) throw err;
+                        console.log("Your role was created successfully!");
+                        options();
+                    }
+                );
+            }
+        );
+    });
+}
+
+function addDepartment() {
+
+}
+
+function updateRole() {
+
 }
