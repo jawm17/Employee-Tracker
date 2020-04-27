@@ -140,7 +140,7 @@ function addEmployee() {
                             },
                             function (err) {
                                 if (err) throw err;
-                                console.log("Your employee was created successfully!");
+                                console.log("Your new employee was created successfully!");
                                 options();
                             }
                         );
@@ -187,7 +187,7 @@ function addRole() {
                     },
                     function (err) {
                         if (err) throw err;
-                        console.log("Your role was created successfully!");
+                        console.log("Your new role was created successfully!");
                         options();
                     }
                 );
@@ -197,9 +197,26 @@ function addRole() {
 }
 
 function addDepartment() {
-
+    inquirer.prompt([
+        {
+            name: "name",
+            type: "input",
+            message: "What is the name of the department?"
+        }
+    ]).then(function (data) {
+        connection.query("INSERT INTO departments SET ?",
+            {
+                name: data.name,
+            },
+            function (err) {
+                if (err) throw err;
+                console.log("Your new department was created successfully!");
+                options();
+            }
+        );
+    });
 }
 
 function updateRole() {
-
+    
 }
