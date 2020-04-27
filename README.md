@@ -1,4 +1,4 @@
-![node](https://img.shields.io/badge/node-js-blue)
+![node](https://img.shields.io/badge/node-js-blue) ![node](https://img.shields.io/badge/employee-tracker-yellow) ![node](https://img.shields.io/badge/javascript-js-green) ![node](https://img.shields.io/badge/mysql-db-yellow)
 # Employee-Tracker
 
 ## Description
