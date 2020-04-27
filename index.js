@@ -218,5 +218,50 @@ function addDepartment() {
 }
 
 function updateRole() {
-    
+    inquirer.prompt([
+        {
+            name: "role",
+            type: "list",
+            message: "What is the name of the role you would like to update?",
+            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer"]
+        },
+        {
+            name: "salary",
+            type: "input",
+            message: "What is the new salary for this role?"
+        },
+        {
+            name: "department",
+            type: "list",
+            message: "What is the new department for this role?",
+            choices: [
+                "Engineering",
+                "Sales",
+                "Finance",
+                "Legal"
+            ]
+        }
+    ]).then(function (data) {
+        connection.query(`SELECT id FROM roles WHERE title = "${data.role}"`,
+            function (err, results) {
+                if (err) throw err;
+                let role = results[0].id;
+                connection.query(`SELECT id FROM departments WHERE name = "${data.department}"`,
+                    function (err, results) {
+                        if (err) throw err;
+                        let department = results[0].id;
+                        connection.query(`UPDATE roles SET ? WHERE id = "${role}"`,
+                            {
+                                salary: data.salary,
+                                department_id: department
+                            },
+                            function (err) {
+                                if (err) throw err;
+                                console.log("Your role was updated successfully!");
+                                options();
+                            }
+                        );
+                    });
+            });
+    });
 }
